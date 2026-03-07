@@ -851,15 +851,20 @@
       statusEl.textContent = "Renderizando preview...";
       fileTypeBadgeEl.textContent = "Tipo: imagen";
 
+      const dpr = window.devicePixelRatio || 1;
       const maxPreviewWidth = 1100;
       const maxPreviewHeight = 1500;
-      const scale = Math.min(
+      const cssScale = Math.min(
         1,
         maxPreviewWidth / currentImage.naturalWidth,
         maxPreviewHeight / currentImage.naturalHeight
       );
+      const renderScale = cssScale * dpr;
 
-      renderImageToCanvas(currentImage, scale, previewCanvas, previewCtx);
+      renderImageToCanvas(currentImage, renderScale, previewCanvas, previewCtx);
+
+      previewCanvas.style.width = Math.round(currentImage.naturalWidth * cssScale) + "px";
+      previewCanvas.style.height = Math.round(currentImage.naturalHeight * cssScale) + "px";
 
       pageIndicatorEl.textContent =
         `Imagen ${currentImage.naturalWidth} × ${currentImage.naturalHeight}`;
@@ -894,15 +899,20 @@
       const page = await pdfInstance.getPage(pageNumber);
       const unscaled = page.getViewport({ scale: 1 });
 
+      const dpr = window.devicePixelRatio || 1;
       const maxPreviewWidth = 1100;
       const maxPreviewHeight = 1500;
-      const previewScale = Math.min(
-        1.6,
+      const cssScale = Math.min(
+        2,
         maxPreviewWidth / unscaled.width,
         maxPreviewHeight / unscaled.height
       );
+      const renderScale = cssScale * dpr;
 
-      await renderPageToCanvas(pageNumber, previewScale, previewCanvas, previewCtx);
+      await renderPageToCanvas(pageNumber, renderScale, previewCanvas, previewCtx);
+
+      previewCanvas.style.width = Math.floor(unscaled.width * cssScale) + "px";
+      previewCanvas.style.height = Math.floor(unscaled.height * cssScale) + "px";
 
       pageIndicatorEl.textContent = `Página ${pageNumber} / ${pdfInstance.numPages}`;
       prevPageButton.disabled = pageNumber <= 1;
