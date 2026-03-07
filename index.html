@@ -331,7 +331,7 @@
           </div>
           <div class="field">
             <label for="target-light">Destino del claro</label>
-            <input type="color" id="target-light" value="#2a2118" />
+            <input type="color" id="target-light" value="#c8a070" />
           </div>
         </div>
 
@@ -342,20 +342,28 @@
           </div>
           <div class="field">
             <label for="target-dark">Destino del oscuro</label>
-            <input type="color" id="target-dark" value="#f0e6cf" />
+            <input type="color" id="target-dark" value="#1c0e00" />
           </div>
         </div>
         <div class="field">
           <label>Presets</label>
           <div class="presets">
+            <button class="secondary-btn" type="button" data-preset="marronsuave">Marrón suave</button>
+            <button class="secondary-btn" type="button" data-preset="pergaminoantiguo">Pergamino antiguo</button>
+            <button class="secondary-btn" type="button" data-preset="softpaper">Papel crema</button>
+            <button class="secondary-btn" type="button" data-preset="papelamarillo">Papel amarillo</button>
             <button class="secondary-btn" type="button" data-preset="amberdark">Ámbar oscuro</button>
             <button class="secondary-btn" type="button" data-preset="sepiahc">Sepia alto contraste</button>
             <button class="secondary-btn" type="button" data-preset="warmgray">Gris cálido</button>
-            <button class="secondary-btn" type="button" data-preset="softpaper">Papel crema</button>
-            <button class="secondary-btn" type="button" data-preset="altacontraste">Alto contraste</button>
-            <button class="secondary-btn" type="button" data-preset="papelamarillo">Papel amarillo</button>
+            <button class="secondary-btn" type="button" data-preset="monocromofrio">Monocromo frío</button>
             <button class="secondary-btn" type="button" data-preset="sinreflejo">Sin deslumbramiento</button>
             <button class="secondary-btn" type="button" data-preset="nochecalida">Noche cálida</button>
+            <button class="secondary-btn" type="button" data-preset="carbonrojo">Carbón y coral</button>
+            <button class="secondary-btn" type="button" data-preset="pizarronverde">Pizarrón verde</button>
+            <button class="secondary-btn" type="button" data-preset="oceano">Océano nocturno</button>
+            <button class="secondary-btn" type="button" data-preset="tintaazul">Tinta sobre azul</button>
+            <button class="secondary-btn" type="button" data-preset="violetasuave">Violeta suave</button>
+            <button class="secondary-btn" type="button" data-preset="altacontraste">Alto contraste</button>
           </div>
         </div>
 
@@ -368,15 +376,15 @@
             <div class="field">
               <label for="threshold">Umbral</label>
               <div class="range-line">
-                <input type="range" id="threshold" min="0" max="255" value="145" />
-                <input type="number" id="threshold-number" min="0" max="255" value="145" />
+                <input type="range" id="threshold" min="0" max="255" value="150" />
+                <input type="number" id="threshold-number" min="0" max="255" value="150" />
               </div>
             </div>
             <div class="field">
               <label for="softness">Suavidad</label>
               <div class="range-line">
-                <input type="range" id="softness" min="1" max="255" value="75" />
-                <input type="number" id="softness-number" min="1" max="255" value="75" />
+                <input type="range" id="softness" min="1" max="255" value="65" />
+                <input type="number" id="softness-number" min="1" max="255" value="65" />
               </div>
             </div>
           </div>
@@ -564,6 +572,70 @@
         targetDark: "#ffcc88",
         threshold: 145,
         softness: 55
+      },
+      marronsuave: {
+        sourceLight: "#ffffff",
+        sourceDark: "#000000",
+        targetLight: "#c8a070",
+        targetDark: "#1c0e00",
+        threshold: 150,
+        softness: 65
+      },
+      pergaminoantiguo: {
+        sourceLight: "#ffffff",
+        sourceDark: "#000000",
+        targetLight: "#e8d8a8",
+        targetDark: "#3a2200",
+        threshold: 148,
+        softness: 62
+      },
+      monocromofrio: {
+        sourceLight: "#ffffff",
+        sourceDark: "#000000",
+        targetLight: "#181c24",
+        targetDark: "#d8e0ec",
+        threshold: 148,
+        softness: 65
+      },
+      carbonrojo: {
+        sourceLight: "#ffffff",
+        sourceDark: "#000000",
+        targetLight: "#140a08",
+        targetDark: "#ffb090",
+        threshold: 140,
+        softness: 52
+      },
+      pizarronverde: {
+        sourceLight: "#ffffff",
+        sourceDark: "#000000",
+        targetLight: "#0b2a18",
+        targetDark: "#c8e8c0",
+        threshold: 140,
+        softness: 55
+      },
+      oceano: {
+        sourceLight: "#ffffff",
+        sourceDark: "#000000",
+        targetLight: "#061828",
+        targetDark: "#a8d4f0",
+        threshold: 142,
+        softness: 58
+      },
+      tintaazul: {
+        sourceLight: "#ffffff",
+        sourceDark: "#000000",
+        targetLight: "#0c1440",
+        targetDark: "#f0e8b0",
+        threshold: 148,
+        softness: 60
+      },
+      violetasuave: {
+        sourceLight: "#ffffff",
+        sourceDark: "#000000",
+        targetLight: "#180c30",
+        targetDark: "#e0d0ff",
+        threshold: 145,
+        softness: 60
       }
     };
     document.querySelectorAll("[data-preset]").forEach((btn) => {
