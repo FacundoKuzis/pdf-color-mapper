@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF Color Mapper</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #111111;
+      --panel: #1c1c1c;
+      --panel-2: #242424;
+      --text: #e8e6e3;
+      --muted: #b5b0aa;
+      --border: #3a3a3a;
+      --accent: #8c6a4d;
+      --accent-2: #d8c6a8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      width: min(1100px, 94vw);
+      margin: 32px auto;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 2rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-bottom: 24px;
+      line-height: 1.45;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.18);
+    }
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: .95rem;
+      color: var(--muted);
+    }
+
+    input[type="file"],
+    input[type="text"],
+    input[type="number"],
+    input[type="range"],
+    button,
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+
+    input[type="color"] {
+      width: 100%;
+      height: 44px;
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .range-line {
+      display: grid;
+      grid-template-columns: 1fr 70px;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .presets {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .preset-btn,
+    .action-btn {
+      cursor: pointer;
+      transition: transform .15s ease, opacity .15s ease, background .15s ease;
+    }
+
+    .preset-btn:hover,
+    .action-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .action-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      font-weight: 700;
+    }
+
+    .action-btn.secondary {
+      background: #3f3a35;
+    }
+
+    .action-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .preview-card {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .preview-toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .preview-toolbar .left,
+    .preview-toolbar .right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 7px 12px;
+      color: var(--muted);
+      font-size: .9rem;
+      background: var(--panel-2);
+    }
+
+    .canvas-wrap {
+      background: #0d0d0d;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      overflow: auto;
+      min-height: 400px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    canvas {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 8px;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.45;
+    }
+
+    .swatches {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .swatch {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      background: var(--panel-2);
+    }
+
+    .swatch-box {
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.08);
+      margin-top: 8px;
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>PDF Color Mapper</h1>
+    <div class="subtitle">
+      Convierte un PDF rasterizando cada página y remapeando colores. Ideal para crear una versión más amigable para ojos sensibles al blanco.
+    </div>
+
+    <div class="grid">
+      <div class="card controls">
+        <div class="field">
+          <label for="upload">PDF</label>
+          <input type="file" id="upload" accept=".pdf,application/pdf">
+        </div>
+
+        <div class="field">
+          <label for="file-name">Nombre del archivo de salida</label>
+          <input type="text" id="file-name" value="pdf_remapeado">
+        </div>
+
+        <div class="field">
+          <label for="resolution">Resolución</label>
+          <select id="resolution">
+            <option value="72">72 PPI (bajo)</option>
+            <option value="150" selected>150 PPI (medio)</option>
+            <option value="300">300 PPI (alto)</option>
+          </select>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label for="source-light">Color claro origen</label>
+            <input type="color" id="source-light" value="#ffffff">
+          </div>
+          <div class="field">
+            <label for="target-light">Destino del claro</label>
+            <input type="color" id="target-light" value="#2b2118">
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label for="source-dark">Color oscuro origen</label>
+            <input type="color" id="source-dark" value="#000000">
+          </div>
+          <div class="field">
+            <label for="target-dark">Destino del oscuro</label>
+            <input type="color" id="target-dark" value="#e6d7b8">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="threshold">Umbral</label>
+          <div class="range-line">
+            <input type="range" id="threshold" min="0" max="255" value="140">
+            <input type="number" id="threshold-number" min="0" max="255" value="140">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="softness">Suavidad de transición</label>
+          <div class="range-line">
+            <input type="range" id="softness" min="1" max="255" value="70">
+            <input type="number" id="softness-number" min="1" max="255" value="70">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Presets</label>
+          <div class="presets">
+            <button class="preset-btn" type="button" data-preset="sepia">Sepia suave</button>
+            <button class="preset-btn" type="button" data-preset="warmdark">Oscuro cálido</button>
+            <button class="preset-btn" type="button" data-preset="paper">Papel viejo</button>
+            <button class="preset-btn" type="button" data-preset="green">Terminal suave</button>
+          </div>
+        </div>
+
+        <div class="swatches">
+          <div class="swatch">
+            <div>Fondo destino</div>
+            <div id="bg-swatch" class="swatch-box"></div>
+          </div>
+          <div class="swatch">
+            <div>Texto destino</div>
+            <div id="fg-swatch" class="swatch-box"></div>
+          </div>
+        </div>
+
+        <button id="preview-button" class="action-btn secondary" disabled>Actualizar preview</button>
+        <button id="download-button" class="action-btn" disabled>Descargar PDF remapeado</button>
+
+        <div class="note">
+          Esta técnica convierte cada página en imagen. Es muy útil para lectura visual, pero el PDF final no conserva texto seleccionable.
+        </div>
+      </div>
+
+      <div class="card preview-card">
+        <div class="preview-toolbar">
+          <div class="left">
+            <span class="badge" id="status">Sin PDF cargado</span>
+            <span class="badge" id="page-indicator">Página 0 / 0</span>
+          </div>
+          <div class="right">
+            <button id="prev-page" class="action-btn secondary" disabled>Anterior</button>
+            <button id="next-page" class="action-btn secondary" disabled>Siguiente</button>
+          </div>
+        </div>
+
+        <div class="canvas-wrap">
+          <canvas id="preview-canvas"></canvas>
+        </div>
+
+        <div class="note">
+          El preview usa la misma lógica de remapeo que la exportación final.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const pdfjsLib = window['pdfjs-dist/build/pdf'];
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+    const { jsPDF } = window.jspdf;
+
+    const uploadInput = document.getElementById('upload');
+    const fileNameInput = document.getElementById('file-name');
+    const resolutionSelect = document.getElementById('resolution');
+
+    const sourceLightInput = document.getElementById('source-light');
+    const sourceDarkInput = document.getElementById('source-dark');
+    const targetLightInput = document.getElementById('target-light');
+    const targetDarkInput = document.getElementById('target-dark');
+
+    const thresholdInput = document.getElementById('threshold');
+    const thresholdNumberInput = document.getElementById('threshold-number');
+    const softnessInput = document.getElementById('softness');
+    const softnessNumberInput = document.getElementById('softness-number');
+
+    const previewButton = document.getElementById('preview-button');
+    const downloadButton = document.getElementById('download-button');
+    const prevPageButton = document.getElementById('prev-page');
+    const nextPageButton = document.getElementById('next-page');
+
+    const statusEl = document.getElementById('status');
+    const pageIndicatorEl = document.getElementById('page-indicator');
+    const bgSwatch = document.getElementById('bg-swatch');
+    const fgSwatch = document.getElementById('fg-swatch');
+
+    const previewCanvas = document.getElementById('preview-canvas');
+    const previewCtx = previewCanvas.getContext('2d', { willReadFrequently: true });
+
+    let pdfInstance = null;
+    let currentPage = 1;
+
+    function syncRangeAndNumber(rangeEl, numberEl) {
+      rangeEl.addEventListener('input', () => {
+        numberEl.value = rangeEl.value;
+      });
+      numberEl.addEventListener('input', () => {
+        let v = Number(numberEl.value);
+        if (Number.isNaN(v)) return;
+        v = Math.max(Number(rangeEl.min), Math.min(Number(rangeEl.max), v));
+        rangeEl.value = v;
+        numberEl.value = v;
+      });
+    }
+
+    syncRangeAndNumber(thresholdInput, thresholdNumberInput);
+    syncRangeAndNumber(softnessInput, softnessNumberInput);
+
+    function hexToRgb(hex) {
+      const clean = hex.replace('#', '');
+      const bigint = parseInt(clean, 16);
+      return {
+        r: (bigint >> 16) & 255,
+        g: (bigint >> 8) & 255,
+        b: bigint & 255
+      };
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function clamp(x, min, max) {
+      return Math.max(min, Math.min(max, x));
+    }
+
+    function smoothstep(edge0, edge1, x) {
+      const t = clamp((x - edge0) / (edge1 - edge0), 0, 1);
+      return t * t * (3 - 2 * t);
+    }
+
+    function luminance(r, g, b) {
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    }
+
+    function updateSwatches() {
+      bgSwatch.style.background = targetLightInput.value;
+      fgSwatch.style.background = targetDarkInput.value;
+    }
+
+    updateSwatches();
+
+    [targetLightInput, targetDarkInput].forEach(el => {
+      el.addEventListener('input', updateSwatches);
+    });
+
+    const presets = {
+      sepia: {
+        sourceLight: '#ffffff',
+        sourceDark: '#000000',
+        targetLight: '#2b2118',
+        targetDark: '#e6d7b8',
+        threshold: 140,
+        softness: 70
+      },
+      warmdark: {
+        sourceLight: '#ffffff',
+        sourceDark: '#000000',
+        targetLight: '#1f1b18',
+        targetDark: '#d8cbb8',
+        threshold: 145,
+        softness: 75
+      },
+      paper: {
+        sourceLight: '#ffffff',
+        sourceDark: '#000000',
+        targetLight: '#e8dfc8',
+        targetDark: '#4a3b2a',
+        threshold: 145,
+        softness: 65
+      },
+      green: {
+        sourceLight: '#ffffff',
+        sourceDark: '#000000',
+        targetLight: '#111713',
+        targetDark: '#b8d8b0',
+        threshold: 140,
+        softness: 70
+      }
+    };
+
+    document.querySelectorAll('[data-preset]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const preset = presets[btn.dataset.preset];
+        sourceLightInput.value = preset.sourceLight;
+        sourceDarkInput.value = preset.sourceDark;
+        targetLightInput.value = preset.targetLight;
+        targetDarkInput.value = preset.targetDark;
+        thresholdInput.value = preset.threshold;
+        thresholdNumberInput.value = preset.threshold;
+        softnessInput.value = preset.softness;
+        softnessNumberInput.value = preset.softness;
+        updateSwatches();
+        if (pdfInstance) renderPreviewPage(currentPage);
+      });
+    });
+
+    function mapCanvasColors(ctx, width, height) {
+      const imageData = ctx.getImageData(0, 0, width, height);
+      const data = imageData.data;
+
+      const sourceLight = hexToRgb(sourceLightInput.value);
+      const sourceDark = hexToRgb(sourceDarkInput.value);
+      const targetLight = hexToRgb(targetLightInput.value);
+      const targetDark = hexToRgb(targetDarkInput.value);
+
+      const lumSourceLight = luminance(sourceLight.r, sourceLight.g, sourceLight.b);
+      const lumSourceDark = luminance(sourceDark.r, sourceDark.g, sourceDark.b);
+
+      const threshold = Number(thresholdInput.value);
+      const softness = Math.max(1, Number(softnessInput.value));
+
+      const low = threshold - softness / 2;
+      const high = threshold + softness / 2;
+
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const a = data[i + 3];
+
+        if (a === 0) continue;
+
+        const lum = luminance(r, g, b);
+
+        let t = smoothstep(low, high, lum);
+
+        if (lumSourceLight < lumSourceDark) {
+          t = 1 - t;
+        }
+
+        data[i]     = Math.round(lerp(targetDark.r, targetLight.r, t));
+        data[i + 1] = Math.round(lerp(targetDark.g, targetLight.g, t));
+        data[i + 2] = Math.round(lerp(targetDark.b, targetLight.b, t));
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+    }
+
+    async function renderPageToCanvas(pageNumber, scale, canvas, ctx) {
+      const page = await pdfInstance.getPage(pageNumber);
+      const viewport = page.getViewport({ scale });
+
+      canvas.width = Math.floor(viewport.width);
+      canvas.height = Math.floor(viewport.height);
+
+      await page.render({
+        canvasContext: ctx,
+        viewport
+      }).promise;
+
+      mapCanvasColors(ctx, canvas.width, canvas.height);
+
+      return viewport;
+    }
+
+    async function renderPreviewPage(pageNumber) {
+      if (!pdfInstance) return;
+
+      statusEl.textContent = 'Renderizando preview...';
+
+      const previewScale = 1.3;
+      await renderPageToCanvas(pageNumber, previewScale, previewCanvas, previewCtx);
+
+      statusEl.textContent = 'Preview listo';
+      pageIndicatorEl.textContent = `Página ${pageNumber} / ${pdfInstance.numPages}`;
+
+      prevPageButton.disabled = pageNumber <= 1;
+      nextPageButton.disabled = pageNumber >= pdfInstance.numPages;
+    }
+
+    uploadInput.addEventListener('change', async (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      if (file.type !== 'application/pdf') {
+        alert('Subí un archivo PDF válido.');
+        return;
+      }
+
+      const url = URL.createObjectURL(file);
+
+      try {
+        statusEl.textContent = 'Cargando PDF...';
+        pdfInstance = await pdfjsLib.getDocument(url).promise;
+        currentPage = 1;
+
+        previewButton.disabled = false;
+        downloadButton.disabled = false;
+        prevPageButton.disabled = false;
+        nextPageButton.disabled = false;
+
+        fileNameInput.value = file.name.replace(/\.pdf$/i, '') + '_remapeado';
+
+        await renderPreviewPage(currentPage);
+      } catch (error) {
+        console.error(error);
+        alert('Error cargando el PDF.');
+        statusEl.textContent = 'Error cargando PDF';
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+    });
+
+    previewButton.addEventListener('click', async () => {
+      if (!pdfInstance) return;
+      await renderPreviewPage(currentPage);
+    });
+
+    prevPageButton.addEventListener('click', async () => {
+      if (!pdfInstance || currentPage <= 1) return;
+      currentPage -= 1;
+      await renderPreviewPage(currentPage);
+    });
+
+    nextPageButton.addEventListener('click', async () => {
+      if (!pdfInstance || currentPage >= pdfInstance.numPages) return;
+      currentPage += 1;
+      await renderPreviewPage(currentPage);
+    });
+
+    [
+      sourceLightInput, sourceDarkInput,
+      targetLightInput, targetDarkInput,
+      thresholdInput, thresholdNumberInput,
+      softnessInput, softnessNumberInput
+    ].forEach(el => {
+      el.addEventListener('input', () => {
+        if (pdfInstance) renderPreviewPage(currentPage);
+      });
+    });
+
+    downloadButton.addEventListener('click', async () => {
+      if (!pdfInstance) return;
+
+      downloadButton.disabled = true;
+      previewButton.disabled = true;
+      statusEl.textContent = 'Generando PDF...';
+
+      try {
+        const resolution = Number(resolutionSelect.value);
+        const fileName = (fileNameInput.value || 'pdf_remapeado').trim();
+
+        let doc = null;
+
+        for (let pageNumber = 1; pageNumber <= pdfInstance.numPages; pageNumber++) {
+          statusEl.textContent = `Procesando página ${pageNumber} de ${pdfInstance.numPages}...`;
+
+          const tempCanvas = document.createElement('canvas');
+          const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+
+          const viewport = await renderPageToCanvas(
+            pageNumber,
+            resolution / 72,
+            tempCanvas,
+            tempCtx
+          );
+
+          const pageWidth = (viewport.width * 72) / resolution;
+          const pageHeight = (viewport.height * 72) / resolution;
+
+          if (!doc) {
+            doc = new jsPDF({
+              orientation: pageWidth > pageHeight ? 'landscape' : 'portrait',
+              unit: 'pt',
+              format: [pageWidth, pageHeight]
+            });
+          } else {
+            doc.addPage([pageWidth, pageHeight], pageWidth > pageHeight ? 'landscape' : 'portrait');
+            doc.setPage(pageNumber);
+          }
+
+          const imgData = tempCanvas.toDataURL('image/jpeg', 0.92);
+          doc.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
+        }
+
+        doc.save(`${fileName}.pdf`);
+        statusEl.textContent = 'PDF listo';
+      } catch (error) {
+        console.error(error);
+        alert('Error generando el PDF.');
+        statusEl.textContent = 'Error generando PDF';
+      } finally {
+        downloadButton.disabled = false;
+        previewButton.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
