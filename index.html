@@ -314,6 +314,8 @@
           <input type="text" id="file-name" value="archivo_remapeado" />
         </div>
 
+        <button id="download-button" class="action-btn" disabled>Descargar archivo</button>
+
         <div class="field">
           <label for="resolution">Resolución de exportación PDF</label>
           <select id="resolution">
@@ -348,27 +350,34 @@
         <div class="field">
           <label>Presets</label>
           <div class="presets">
-            <button class="secondary-btn" type="button" data-preset="marronsuave">Marrón suave</button>
-            <button class="secondary-btn" type="button" data-preset="pergaminoantiguo">Pergamino antiguo</button>
-            <button class="secondary-btn" type="button" data-preset="softpaper">Papel crema</button>
-            <button class="secondary-btn" type="button" data-preset="papelamarillo">Papel amarillo</button>
-            <button class="secondary-btn" type="button" data-preset="amberdark">Ámbar oscuro</button>
-            <button class="secondary-btn" type="button" data-preset="sepiahc">Sepia alto contraste</button>
+            <button class="secondary-btn" type="button" data-preset="marronsuave">Café con leche</button>
+            <button class="secondary-btn" type="button" data-preset="pergaminoantiguo">Pergamino</button>
+            <button class="secondary-btn" type="button" data-preset="softpaper">Crema</button>
+            <button class="secondary-btn" type="button" data-preset="papelamarillo">Amarillo</button>
+            <button class="secondary-btn" type="button" data-preset="amberdark">Ámbar</button>
+            <button class="secondary-btn" type="button" data-preset="sepiahc">Sepia</button>
             <button class="secondary-btn" type="button" data-preset="warmgray">Gris cálido</button>
-            <button class="secondary-btn" type="button" data-preset="monocromofrio">Monocromo frío</button>
-            <button class="secondary-btn" type="button" data-preset="sinreflejo">Sin deslumbramiento</button>
-            <button class="secondary-btn" type="button" data-preset="nochecalida">Noche cálida</button>
-            <button class="secondary-btn" type="button" data-preset="carbonrojo">Carbón y coral</button>
-            <button class="secondary-btn" type="button" data-preset="pizarronverde">Pizarrón verde</button>
-            <button class="secondary-btn" type="button" data-preset="oceano">Océano nocturno</button>
-            <button class="secondary-btn" type="button" data-preset="tintaazul">Tinta sobre azul</button>
-            <button class="secondary-btn" type="button" data-preset="violetasuave">Violeta suave</button>
-            <button class="secondary-btn" type="button" data-preset="altacontraste">Alto contraste</button>
+            <button class="secondary-btn" type="button" data-preset="monocromofrio">Gris frío</button>
+            <button class="secondary-btn" type="button" data-preset="sinreflejo">Ámbar invertido</button>
+            <button class="secondary-btn" type="button" data-preset="nochecalida">Naranja oscuro</button>
+            <button class="secondary-btn" type="button" data-preset="carbonrojo">Coral oscuro</button>
+            <button class="secondary-btn" type="button" data-preset="pizarronverde">Pizarra verde</button>
+            <button class="secondary-btn" type="button" data-preset="oceano">Azul marino</button>
+            <button class="secondary-btn" type="button" data-preset="tintaazul">Azul y crema</button>
+            <button class="secondary-btn" type="button" data-preset="violetasuave">Violeta</button>
+            <button class="secondary-btn" type="button" data-preset="altacontraste">Blanco y negro</button>
+            <button class="secondary-btn" type="button" data-preset="cieloazul">Cielo azul</button>
+            <button class="secondary-btn" type="button" data-preset="azulhielo">Azul hielo</button>
+            <button class="secondary-btn" type="button" data-preset="azulprofundo">Azul profundo</button>
+            <button class="secondary-btn" type="button" data-preset="menta">Menta</button>
+            <button class="secondary-btn" type="button" data-preset="rosa">Rosa</button>
+            <button class="secondary-btn" type="button" data-preset="terracota">Terracota</button>
+            <button class="secondary-btn" type="button" data-preset="oliva">Oliva</button>
+            <button class="secondary-btn" type="button" data-preset="lavanda">Lavanda</button>
           </div>
         </div>
 
         <button id="preview-button" class="secondary-btn" disabled>Actualizar preview</button>
-        <button id="download-button" class="action-btn" disabled>Descargar archivo</button>
 
         <details class="advanced">
           <summary>Configuración avanzada</summary>
@@ -636,6 +645,70 @@
         targetDark: "#e0d0ff",
         threshold: 145,
         softness: 60
+      },
+      cieloazul: {
+        sourceLight: "#ffffff",
+        sourceDark: "#000000",
+        targetLight: "#d0e4f8",
+        targetDark: "#0a1e3a",
+        threshold: 150,
+        softness: 62
+      },
+      azulhielo: {
+        sourceLight: "#ffffff",
+        sourceDark: "#000000",
+        targetLight: "#e4f0fa",
+        targetDark: "#1a2a40",
+        threshold: 152,
+        softness: 68
+      },
+      azulprofundo: {
+        sourceLight: "#ffffff",
+        sourceDark: "#000000",
+        targetLight: "#081020",
+        targetDark: "#90c0ff",
+        threshold: 144,
+        softness: 55
+      },
+      menta: {
+        sourceLight: "#ffffff",
+        sourceDark: "#000000",
+        targetLight: "#d8f4e8",
+        targetDark: "#0a2a1c",
+        threshold: 148,
+        softness: 64
+      },
+      rosa: {
+        sourceLight: "#ffffff",
+        sourceDark: "#000000",
+        targetLight: "#f8dce8",
+        targetDark: "#3a0a20",
+        threshold: 150,
+        softness: 62
+      },
+      terracota: {
+        sourceLight: "#ffffff",
+        sourceDark: "#000000",
+        targetLight: "#1e0c08",
+        targetDark: "#e8a080",
+        threshold: 142,
+        softness: 58
+      },
+      oliva: {
+        sourceLight: "#ffffff",
+        sourceDark: "#000000",
+        targetLight: "#1a1e0c",
+        targetDark: "#d4d8a0",
+        threshold: 145,
+        softness: 60
+      },
+      lavanda: {
+        sourceLight: "#ffffff",
+        sourceDark: "#000000",
+        targetLight: "#f0e8f8",
+        targetDark: "#28103a",
+        threshold: 150,
+        softness: 65
       }
     };
     document.querySelectorAll("[data-preset]").forEach((btn) => {
