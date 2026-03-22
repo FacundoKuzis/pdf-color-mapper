@@ -110,22 +110,31 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      gap: 10px;
       width: 100%;
-      padding: 36px 20px;
+      padding: 28px 20px;
       background: #1b0e01;
       color: #c4a073;
       border: 1.5px solid #c4a073;
       border-radius: 10px;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 600;
       cursor: pointer;
       text-align: center;
       box-sizing: border-box;
-      transition: background 0.15s, color 0.15s;
+      transition: background 0.15s, box-shadow 0.15s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      user-select: none;
     }
 
     .upload-label:hover {
       background: #2e1a02;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+    }
+
+    .upload-label:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
     }
 
     input[type="color"] {
@@ -359,7 +368,7 @@
             style="display:none"
           />
           <label for="upload" id="upload-label" class="upload-label">
-            <span id="upload-label-text">Seleccioná un archivo PDF, PNG o JPG</span>
+            ↑ <span id="upload-label-text">Seleccioná un archivo PDF, PNG o JPG</span>
           </label>
         </div>
 
